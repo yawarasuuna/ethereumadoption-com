@@ -2,7 +2,6 @@
 layout: default
 ---
 
-
 {%- include partials/header.html -%}
 
 <div class="container">
@@ -14,7 +13,6 @@ layout: default
   </div>
 </div>
 
-
 <!-- Content -->
 <section class="pb-5">
   <div class="container">
@@ -24,19 +22,9 @@ layout: default
           <div class="card-body my-3 mx-0 mx-sm-2 mx-md-3">
             {% include partials/search.html %}
             {% include partials/view-controls.html %}
-            <!-- Group by Date -->
-            <div id="dateGroup" class="">
-              {% include partials/grouped-by-date-chart.html %}
-              {% include partials/grouped-by-date.html %}
-            </div>
             <!-- Group by Entity -->
-            <div id="entityGroup" class="d-none">
+            <div id="entityGroup">
               {% include partials/grouped-by-entity.html %}
-            </div>
-            <!-- Group by Network -->
-            <div id="networkGroup" class="d-none">
-              {% include partials/grouped-by-network-chart.html %}
-              {% include partials/grouped-by-network.html %}
             </div>
           </div>
         </div>
