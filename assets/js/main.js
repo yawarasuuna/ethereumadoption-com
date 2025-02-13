@@ -2,52 +2,14 @@
 ---
 
 function handleViewChange(viewType) {
-  // Hide all groups
-  document.getElementById('dateGroup').classList.add('d-none');
-  document.getElementById('entityGroup').classList.add('d-none');
-  document.getElementById('networkGroup').classList.add('d-none');
-
-  // Show selected group
-  let groupId;
-  switch(viewType) {
-    case 'byDate':
-      groupId = 'dateGroup';
-      break;
-    case 'byEntity':
-      groupId = 'entityGroup';
-      break;
-    case 'byNetwork':
-      groupId = 'networkGroup';
-      break;
-    default:
-      groupId = 'dateGroup';
-  }
-
-  document.getElementById(groupId).classList.remove('d-none');
-  
-  // Update URL without refreshing page
-  const newPath = `${window.location.pathname.split('?')[0]}?view=${viewType}`;
-  window.history.pushState({}, '', newPath);
+  // Show entity group
+  document.getElementById('entityGroup').style.display = 'block';
 }
 
 // Handle initial load
 document.addEventListener('DOMContentLoaded', function() {
-  // Get view from URL parameter
-  const urlParams = new URLSearchParams(window.location.search);
-  const view = urlParams.get('view');
-  
-  if (view) {
-    // Check the appropriate radio button
-    const radioButton = document.getElementById(view);
-    if (radioButton) {
-      radioButton.checked = true;
-      handleViewChange(view);
-    }
-  }
-
-  // Set up link handling
-  updateLinkTargets();
-  enableTooltips();
+  // Always show entity group
+  document.getElementById('entityGroup').style.display = 'block';
 });
 
 // Handle link targets
