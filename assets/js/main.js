@@ -1,141 +1,80 @@
 ---
 ---
 
-window.onload = load();
+function handleViewChange(viewType) {
+  // Hide all groups
+  document.getElementById('dateGroup').classList.add('d-none');
+  document.getElementById('entityGroup').classList.add('d-none');
+  document.getElementById('networkGroup').classList.add('d-none');
 
-function load() {
-  // if params detected, set active view
-  let params = getQueryParameters();
-  if ("view" in params) {
-    setView(params.view)
+  // Show selected group
+  let groupId;
+  switch(viewType) {
+    case 'byDate':
+      groupId = 'dateGroup';
+      break;
+    case 'byEntity':
+      groupId = 'entityGroup';
+      break;
+    case 'byNetwork':
+      groupId = 'networkGroup';
+      break;
+    default:
+      groupId = 'dateGroup';
   }
+
+  document.getElementById(groupId).classList.remove('d-none');
+  
+  // Update URL without refreshing page
+  const newPath = `${window.location.pathname.split('?')[0]}?view=${viewType}`;
+  window.history.pushState({}, '', newPath);
+}
+
+// Handle initial load
+document.addEventListener('DOMContentLoaded', function() {
+  // Get view from URL parameter
+  const urlParams = new URLSearchParams(window.location.search);
+  const view = urlParams.get('view');
+  
+  if (view) {
+    // Check the appropriate radio button
+    const radioButton = document.getElementById(view);
+    if (radioButton) {
+      radioButton.checked = true;
+      handleViewChange(view);
+    }
+  }
+
+  // Set up link handling
   updateLinkTargets();
   enableTooltips();
-}
+});
 
-window.onload = updateLinkTargets();
-
-// update the url parameters (does not trigger page refresh)
-function setQueryParameters(params=false) {
-  // pass params as string; "x=i&y=j&z=k"
-  params = params ? params : "";
-  if (params != "") {
-    params = "?" + params;
-  }
-  let viewSelection = document.querySelector('input[name="view"]:checked').value;
-  let anchor = window.location.href.split("#")[1];
-  if (anchor != undefined) {
-    if (anchor.includes("year-") && viewSelection != "dateGroup") {
-      anchor = "";
-    }
-    if (anchor.includes("entity-") && viewSelection != "entityGroup") {
-      anchor = "";
-    }
-    if (anchor.includes("network-") && viewSelection != "networkGroup") {
-      anchor = "";
-    }
-  }
-  anchor = (anchor == "" || anchor == undefined) ? "" : `#${anchor}`;
-  
-  // Get the base URL considering GitHub Pages deployment
-  let baseUrl = window.location.pathname;
-  // Remove trailing slash if present
-  baseUrl = baseUrl.replace(/\/$/, '');
-  
-  let url = `${baseUrl}${params}${anchor}`;
-  window.history.replaceState(null, "", url);
-}
-
-// gets the url parameters
-function getQueryParameters() {
-  try {
-    let queryString = location.search.slice(1), params = {};
-    queryString.replace(/([^=]*)=([^&]*)&*/g, (_, key, value) => {
-      params[key] = value;
-    });
-    return params;
-  } catch {
-    return null;
-  }
-}
-
-function setView(viewId) {
-  try {
-    let viewSelected = document.querySelector(`#${viewId}`);
-    if (viewSelected) {
-      viewSelected.checked = true;
-      applyView(viewSelected);
-    } else {
-      console.log(`view id does not exist: ${viewId}`);
-    }
-  } catch (error) {
-    console.error('Error setting view:', error);
-  }
-}
-
-function applyView(view) {
-  let dateGroup = document.getElementById("dateGroup");
-  let entityGroup = document.getElementById("entityGroup");
-  let networkGroup = document.getElementById("networkGroup");
-  
-  // Hide all groups first
-  [dateGroup, entityGroup, networkGroup].forEach(group => {
-    if (group) group.classList.add("d-none");
-  });
-  
-  // Show selected group
-  let selectedGroup = document.querySelector(`#${view.value}`);
-  if (selectedGroup) {
-    selectedGroup.classList.remove("d-none");
-    setQueryParameters(`view=${view.id}`);
-  }
-}
-
-// Rest of the functions remain the same...
-
-
-
-
-
-
-
-// open external links and pdfs in new tab
+// Handle link targets
 function updateLinkTargets() {
-  {%- assign site_url = site.url | split: "//" | last -%}
   document.querySelectorAll("a").forEach(link => {
     let href = link.href;
-    // set all links to open in new tab
-    if (/^(https?:)?\/\//.test(link.href)) {
+    if (/^(https?:)?\/\//.test(href)) {
       link.target = "_blank";
     }
-    // if current domain, use same tab
-    if (href != undefined && href.includes("{{site_url}}")) {
-      link.target = "_self";
-    }
-    // if relative links, use new tab
-    if (href != undefined && !href.includes("https")) {
-      link.target = "_self";
-    }
-    // open all .pdf, .png, .jpg, .mp4 in new tab
     if (/(\.pdf$|\.png$|\.jpe*g$|\.mp4)/.test(href)) {
       link.target = "_blank";
     }
-    // if new-tab class, use new tab
     if (link.classList.contains("new-tab")) {
       link.target = "_blank";
     }
-  })
+  });
 }
 
-// enable tooltips
+// Enable tooltips
 function enableTooltips() {
   let tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
   let tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
     return new bootstrap.Tooltip(tooltipTriggerEl)
-  })
+  });
 }
 
-// copy link and show tooltip confirmation
+// Copy text functionality
 function copyText(text, id) {
   navigator.clipboard.writeText(text).then(function() {
     let tooltipElement = document.getElementById(id);
@@ -146,8 +85,3 @@ function copyText(text, id) {
     console.error('Could not copy text: ', err);
   });
 }
-
-
-
-
-
