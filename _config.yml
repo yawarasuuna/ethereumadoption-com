@@ -8,6 +8,7 @@ timezone: America/New_York
 markdown: kramdown
 port: 4400
 livereload: true
+baseurl: "/ethereumadoption-com"
 
 # Plugins
 plugins:
