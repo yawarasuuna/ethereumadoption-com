@@ -1,7 +1,6 @@
 ---
 ---
 
-
 window.onload = load();
 
 function load() {
@@ -15,10 +14,6 @@ function load() {
 }
 
 window.onload = updateLinkTargets();
-
-
-
-
 
 // update the url parameters (does not trigger page refresh)
 function setQueryParameters(params=false) {
@@ -41,10 +36,16 @@ function setQueryParameters(params=false) {
     }
   }
   anchor = (anchor == "" || anchor == undefined) ? "" : `#${anchor}`;
-  let url = `{{site.url}}/${params}${anchor}`;
-  url = url.replace("localhost", "127.0.0.1");
+  
+  // Get the base URL considering GitHub Pages deployment
+  let baseUrl = window.location.pathname;
+  // Remove trailing slash if present
+  baseUrl = baseUrl.replace(/\/$/, '');
+  
+  let url = `${baseUrl}${params}${anchor}`;
   window.history.replaceState(null, "", url);
 }
+
 // gets the url parameters
 function getQueryParameters() {
   try {
@@ -57,26 +58,40 @@ function getQueryParameters() {
     return null;
   }
 }
+
 function setView(viewId) {
   try {
-    viewSelected = document.querySelector(`#${viewId}`)
-    viewSelected.checked = true;
-    applyView(viewSelected);
-  }
-  catch {
-    console.log(`view id does not exist: ${viewId}`);
+    let viewSelected = document.querySelector(`#${viewId}`);
+    if (viewSelected) {
+      viewSelected.checked = true;
+      applyView(viewSelected);
+    } else {
+      console.log(`view id does not exist: ${viewId}`);
+    }
+  } catch (error) {
+    console.error('Error setting view:', error);
   }
 }
+
 function applyView(view) {
   let dateGroup = document.getElementById("dateGroup");
   let entityGroup = document.getElementById("entityGroup");
   let networkGroup = document.getElementById("networkGroup");
-  dateGroup.classList.add("d-none");
-  entityGroup.classList.add("d-none");
-  networkGroup.classList.add("d-none");
-  document.querySelector(`#${view.value}`).classList.remove("d-none");
-  setQueryParameters(`view=${view.id}`);
+  
+  // Hide all groups first
+  [dateGroup, entityGroup, networkGroup].forEach(group => {
+    if (group) group.classList.add("d-none");
+  });
+  
+  // Show selected group
+  let selectedGroup = document.querySelector(`#${view.value}`);
+  if (selectedGroup) {
+    selectedGroup.classList.remove("d-none");
+    setQueryParameters(`view=${view.id}`);
+  }
 }
+
+// Rest of the functions remain the same...
 
 
 
